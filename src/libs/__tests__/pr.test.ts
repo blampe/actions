@@ -6,7 +6,7 @@ const comments = [
   { id: 1, body: 'not relevant', user: { type: 'User' } },
   {
     id: 2,
-    body: `:tropical_drink: The **[Update (preview)](https://app.pulumi.com/d11a6e2c-f88b-49d9-9307-1afba3c8ee29)** for stack **[stack/name](https://app.pulumi.com/org/stack/name)** was successful.
+    body: `🍹 The **[Update (preview)](https://app.pulumi.com/d11a6e2c-f88b-49d9-9307-1afba3c8ee29)** for stack **[stack/name](https://app.pulumi.com/org/stack/name)** was successful.
 
 ## Resource Changes
 \`\`\`

@@ -43,10 +43,7 @@ export async function handlePullRequestMessage(
       });
       console.log(comments);
       const comment = comments.find((comment) => {
-        return (
-          comment.user.type === 'Bot' &&
-          comment.body.match(`:tropical_drink:.*${command}.*${stackName}`)
-        );
+        return comment.body.match(`🍹.*${command}.*${stackName}`);
       });
 
       // If comment exists, update it.
