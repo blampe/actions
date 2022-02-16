@@ -36,10 +36,12 @@ export async function handlePullRequestMessage(
 
   try {
     if (editCommentOnPr) {
+      console.log('editing PR');
       const { data: comments } = await octokit.rest.issues.listComments({
         ...repo,
         issue_number: payload.pull_request.number,
       });
+      console.log(comments);
       const comment = comments.find((comment) => {
         return (
           comment.user.type === 'Bot' &&
@@ -49,6 +51,7 @@ export async function handlePullRequestMessage(
 
       // If comment exists, update it.
       if (comment) {
+        console.log('found', comment);
         await octokit.rest.issues.updateComment({
           ...repo,
           comment_id: comment.id,
