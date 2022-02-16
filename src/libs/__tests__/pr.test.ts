@@ -2,7 +2,7 @@ import * as gh from '@actions/github';
 import { Config } from '../../config';
 import { handlePullRequestMessage } from '../pr';
 
-const comments = [
+const reviews = [
   { id: 1, body: 'not relevant', user: { type: 'User' } },
   {
     id: 2,
@@ -10,12 +10,11 @@ const comments = [
     user: { type: 'Bot' },
   },
 ];
-const listComments = jest.fn((_) => {
-  return { data: comments };
+const listReviews = jest.fn((_) => {
+  return { data: reviews };
 });
-
+const updateReview = jest.fn();
 const createComment = jest.fn();
-const updateComment = jest.fn();
 
 jest.mock('@actions/github', () => ({
   context: {},
@@ -23,8 +22,10 @@ jest.mock('@actions/github', () => ({
     rest: {
       issues: {
         createComment,
-        listComments,
-        updateComment,
+      },
+      pulls: {
+        listReviews,
+        updateReview,
       },
     },
   })),
@@ -34,7 +35,8 @@ describe('pr.ts', () => {
   beforeEach(() => {
     jest.resetModules();
     createComment.mockClear();
-    updateComment.mockClear();
+    listReviews.mockClear();
+    updateReview.mockClear();
   });
 
   it('should add pull request message', async () => {
@@ -96,7 +98,7 @@ Name Type Operation
       newRawOutput,
     );
 
-    expect(updateComment).toHaveBeenCalled();
+    expect(updateReview).toHaveBeenCalled();
   });
 
   it('should trim the output when the output is larger than 64k characters', async () => {

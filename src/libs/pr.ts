@@ -36,24 +36,23 @@ export async function handlePullRequestMessage(
 
   try {
     if (editCommentOnPr) {
-      console.log('editing PR');
-      const { data: comments } = await octokit.rest.issues.listComments({
+      const { data: reviews } = await octokit.rest.pulls.listReviews({
         ...repo,
-        issue_number: payload.pull_request.number,
+        pull_number: payload.pull_request.number,
       });
-      console.log(comments);
-      const comment = comments.find((comment) => {
-        return comment.body.search(
-          `:tropical_drink:.*${command}.*${stackName}`,
+      const review = reviews.find((review) => {
+        return (
+          review.user.type === 'Bot' &&
+          review.body.search(`:tropical_drink:.*${command}.*${stackName}`)
         );
       });
 
       // If comment exists, update it.
-      if (comment) {
-        console.log('found', comment);
-        await octokit.rest.issues.updateComment({
+      if (review) {
+        await octokit.rest.pulls.updateReview({
           ...repo,
-          comment_id: comment.id,
+          review_id: review.id,
+          pull_number: payload.pull_request.number,
           body,
         });
         return;
