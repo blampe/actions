@@ -87858,7 +87858,6 @@ var dedent = __nccwpck_require__(5281);
 
 
 
-
 function handlePullRequestMessage(config, output) {
     return modules_awaiter(this, void 0, void 0, function* () {
         const { githubToken, command, stackName, options: { editCommentOnPr }, } = config;
@@ -87876,24 +87875,21 @@ function handlePullRequestMessage(config, output) {
         const { payload, repo } = github.context;
         invariant(payload.pull_request, 'Missing pull request event data.');
         const octokit = (0,github.getOctokit)(githubToken);
-        try {
-            if (editCommentOnPr) {
-                const { data: reviews } = yield octokit.rest.pulls.listReviews(Object.assign(Object.assign({}, repo), { pull_number: payload.pull_request.number }));
-                const review = reviews.find((review) => {
-                    return (review.user.type === 'Bot' &&
-                        review.body.search(`:tropical_drink:.*${command}.*${stackName}`));
-                });
-                // If comment exists, update it.
-                if (review) {
-                    yield octokit.rest.pulls.updateReview(Object.assign(Object.assign({}, repo), { review_id: review.id, pull_number: payload.pull_request.number, body }));
-                    return;
-                }
+        if (editCommentOnPr) {
+            const { data: reviews } = yield octokit.rest.pulls.listReviews(Object.assign(Object.assign({}, repo), { pull_number: payload.pull_request.number }));
+            const review = reviews.find((review) => {
+                return (review.user.type === 'Bot' &&
+                    review.body.search(`:tropical_drink:.*${command}.*${stackName}`));
+            });
+            // If comment exists, update it.
+            if (review) {
+                yield octokit.rest.pulls.updateReview(Object.assign(Object.assign({}, repo), { review_id: review.id, pull_number: payload.pull_request.number, body }));
+                return;
             }
         }
-        catch (_a) {
-            core.warning('Not able to edit comment, defaulting to creating a new comment.');
+        else {
+            yield octokit.rest.pulls.createReview(Object.assign(Object.assign({}, repo), { pull_number: payload.pull_request.number, body }));
         }
-        yield octokit.rest.issues.createComment(Object.assign(Object.assign({}, repo), { issue_number: payload.pull_request.number, body }));
     });
 }
 
@@ -88120,7 +88116,7 @@ const main = () => modules_awaiter(void 0, void 0, void 0, function* () {
         }
     }
     if (config.commentOnPr) {
-        core.debug(`Commenting on pull request`);
+        core.warning(`Commenting on pull request`);
         invariant(config.githubToken, 'github-token is missing.');
         handlePullRequestMessage(config, output);
     }

@@ -14,18 +14,16 @@ const listReviews = jest.fn((_) => {
   return { data: reviews };
 });
 const updateReview = jest.fn();
-const createComment = jest.fn();
+const createReview = jest.fn();
 
 jest.mock('@actions/github', () => ({
   context: {},
   getOctokit: jest.fn(() => ({
     rest: {
-      issues: {
-        createComment,
-      },
       pulls: {
         listReviews,
         updateReview,
+        createReview,
       },
     },
   })),
@@ -34,7 +32,7 @@ jest.mock('@actions/github', () => ({
 describe('pr.ts', () => {
   beforeEach(() => {
     jest.resetModules();
-    createComment.mockClear();
+    createReview.mockClear();
     listReviews.mockClear();
     updateReview.mockClear();
   });
@@ -52,7 +50,7 @@ describe('pr.ts', () => {
     process.env.GITHUB_REPOSITORY = 'pulumi/actions';
 
     await handlePullRequestMessage({ options: {} } as Config, 'test');
-    expect(createComment).toHaveBeenCalled();
+    expect(createReview).toHaveBeenCalled();
   });
 
   it('should fail if no pull request data', async () => {
@@ -117,7 +115,7 @@ Name Type Operation
       'a'.repeat(65_000),
     );
 
-    const call = createComment.mock.calls[0][0];
+    const call = createReview.mock.calls[0][0];
     expect(call.body.length).toBeLessThan(65_536);
     expect(call.body).toContain('The output was too long and was trimmed');
   });
