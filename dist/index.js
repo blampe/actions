@@ -87858,6 +87858,7 @@ var dedent = __nccwpck_require__(5281);
 
 
 
+
 function handlePullRequestMessage(config, output) {
     return modules_awaiter(this, void 0, void 0, function* () {
         const { githubToken, command, stackName, options: { editCommentOnPr }, } = config;
@@ -87876,18 +87877,24 @@ function handlePullRequestMessage(config, output) {
         invariant(payload.pull_request, 'Missing pull request event data.');
         const octokit = (0,github.getOctokit)(githubToken);
         if (editCommentOnPr) {
+            core.warning(`Attempting to edit comment`);
             const { data: reviews } = yield octokit.rest.pulls.listReviews(Object.assign(Object.assign({}, repo), { pull_number: payload.pull_request.number }));
+            core.warning(`Found these reviews`);
             const review = reviews.find((review) => {
                 return (review.user.type === 'Bot' &&
                     review.body.search(`:tropical_drink:.*${command}.*${stackName}`));
             });
+            core.warning(`Narrowed down to this one`);
             // If comment exists, update it.
             if (review) {
+                core.warning(`Updating the review`);
                 yield octokit.rest.pulls.updateReview(Object.assign(Object.assign({}, repo), { review_id: review.id, pull_number: payload.pull_request.number, body }));
+                core.warning(`Done!`);
                 return;
             }
         }
         else {
+            core.warning(`Falling back - create review`);
             yield octokit.rest.pulls.createReview(Object.assign(Object.assign({}, repo), { pull_number: payload.pull_request.number, body }));
         }
     });
