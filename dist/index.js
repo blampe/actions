@@ -87870,7 +87870,7 @@ function handlePullRequestMessage(config, output) {
     ${rawBody}
     \`\`\`
     ${rawBody.length === 64000
-            ? '**Warn**: The output was too long and trimmed.'
+            ? '**Warn**: The output was too long and was trimmed.'
             : ''}
   `;
         const { payload, repo } = github.context;
@@ -87879,7 +87879,10 @@ function handlePullRequestMessage(config, output) {
         try {
             if (editCommentOnPr) {
                 const { data: comments } = yield octokit.rest.issues.listComments(Object.assign(Object.assign({}, repo), { issue_number: payload.pull_request.number }));
-                const comment = comments.find((comment) => comment.body.startsWith(heading));
+                const comment = comments.find((comment) => {
+                    return (comment.user.type === 'Bot' &&
+                        comment.body.match(`:tropical_drink:.*${command}.*${stackName}`));
+                });
                 // If comment exists, update it.
                 if (comment) {
                     yield octokit.rest.issues.updateComment(Object.assign(Object.assign({}, repo), { comment_id: comment.id, body }));
