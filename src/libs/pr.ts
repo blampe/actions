@@ -40,25 +40,28 @@ export async function handlePullRequestMessage(
       ...repo,
       pull_number: payload.pull_request.number,
     });
-    core.warning(`Found these reviews`);
+    core.warning(`Found these reviews ${reviews}`);
+    core.warning(`Found these reviews ${JSON.stringify(reviews)}`);
     const review = reviews.find((review) => {
       return (
         review.user.type === 'Bot' &&
         review.body.search(`:tropical_drink:.*${command}.*${stackName}`)
       );
     });
-    core.warning(`Narrowed down to this one`);
+    core.warning(`Narrowed down to this one ${review}`);
+    core.warning(`Narrowed down to this one ${JSON.stringify(review)}`);
 
     // If comment exists, update it.
     if (review) {
       core.warning(`Updating the review`);
-      await octokit.rest.pulls.updateReview({
+      const response = await octokit.rest.pulls.updateReview({
         ...repo,
         review_id: review.id,
         pull_number: payload.pull_request.number,
         body,
       });
-      core.warning(`Done!`);
+      core.warning(`Done! ${response}`);
+      core.warning(`Done! ${JSON.stringify(response)}`);
       return;
     }
   } else {
