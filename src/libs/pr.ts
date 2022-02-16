@@ -43,7 +43,9 @@ export async function handlePullRequestMessage(
       });
       console.log(comments);
       const comment = comments.find((comment) => {
-        return comment.body.match(`🍹.*${command}.*${stackName}`);
+        return comment.body.search(
+          `:tropical_drink:.*${command}.*${stackName}`,
+        );
       });
 
       // If comment exists, update it.

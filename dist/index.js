@@ -87882,7 +87882,7 @@ function handlePullRequestMessage(config, output) {
                 const { data: comments } = yield octokit.rest.issues.listComments(Object.assign(Object.assign({}, repo), { issue_number: payload.pull_request.number }));
                 console.log(comments);
                 const comment = comments.find((comment) => {
-                    return comment.body.match(`🍹.*${command}.*${stackName}`);
+                    return comment.body.search(`:tropical_drink:.*${command}.*${stackName}`);
                 });
                 // If comment exists, update it.
                 if (comment) {
