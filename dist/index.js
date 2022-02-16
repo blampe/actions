@@ -87879,17 +87879,20 @@ function handlePullRequestMessage(config, output) {
         if (editCommentOnPr) {
             core.warning(`Attempting to edit comment`);
             const { data: reviews } = yield octokit.rest.pulls.listReviews(Object.assign(Object.assign({}, repo), { pull_number: payload.pull_request.number }));
-            core.warning(`Found these reviews`);
+            core.warning(`Found these reviews ${reviews}`);
+            core.warning(`Found these reviews ${JSON.stringify(reviews)}`);
             const review = reviews.find((review) => {
                 return (review.user.type === 'Bot' &&
                     review.body.search(`:tropical_drink:.*${command}.*${stackName}`));
             });
-            core.warning(`Narrowed down to this one`);
+            core.warning(`Narrowed down to this one ${review}`);
+            core.warning(`Narrowed down to this one ${JSON.stringify(review)}`);
             // If comment exists, update it.
             if (review) {
                 core.warning(`Updating the review`);
-                yield octokit.rest.pulls.updateReview(Object.assign(Object.assign({}, repo), { review_id: review.id, pull_number: payload.pull_request.number, body }));
-                core.warning(`Done!`);
+                const response = yield octokit.rest.pulls.updateReview(Object.assign(Object.assign({}, repo), { review_id: review.id, pull_number: payload.pull_request.number, body }));
+                core.warning(`Done! ${response}`);
+                core.warning(`Done! ${JSON.stringify(response)}`);
                 return;
             }
         }
