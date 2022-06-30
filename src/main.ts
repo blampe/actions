@@ -20,7 +20,7 @@ const main = async () => {
   await pulumiCli.downloadCli(pulumiVersion);
 
   if (environmentVariables.PULUMI_ACCESS_TOKEN !== '') {
-    core.debug(`Logging into Pulumi`);
+    core.debug(`Logging into Pulumi API `, environmentVariables.PULUMI_API);
     await pulumiCli.run('login');
   } else if (config.cloudUrl) {
     core.debug(`Logging into ${config.cloudUrl}`);
